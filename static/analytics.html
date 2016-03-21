@@ -39,6 +39,7 @@
                 <th>Title</th>
                 <th>Categories</th>
                 <th>Time</th>
+                <th> # Comments </th>
             </tr>
         </thead>
         <tfoot>
@@ -47,6 +48,7 @@
                 <th>Title</th>
                 <th>Categories</th>
                 <th>Time</th>
+                <th> # Comments </th>
             </tr>
         </tfoot>
     </table>
@@ -60,24 +62,24 @@
 
     <div ng-show="checkActive(2)" id="singlepost">
     	<div id="postmain">
-	    	<h2> # {{postnum}} : {{posttitle}} </h2>
+	    	<h2> # {{postnum}} : {{post.title}} </h2>
 	    	 <ul class='list-inline'>
-	    	 <li> Posted at {{posttime}} </li>
+	    	 <li> Posted at {{post.date}} </li>
 	    	 <li> <b> Tags: </b> </li>
-	    		<li ng-repeat="tag in posttags"> {{tag}} </li>
+	    		<li ng-repeat="tag in post.tags"> {{tag}} </li>
 	    	</ul>
-	    	<h4> {{postbody}}</h4>
+	    	<h4> {{post.body}}</h4>
     	</div>
     	<div class="col-md-6">
 	    	<h3> {{postcomments.length}} Comments </h3>
 	    	<ul class="list-group">
-	    		<li class="list-group-item" ng-repeat="comment in postcomments"> {{comment.comment}} - {{diffDates(posttime,comment.date)}} after post </li>
+	    		<li class="list-group-item" ng-repeat="comment in post.comments"> {{comment.comment}} - {{diffDates(post.date,comment.date)}} after post </li>
 	    	</ul>
     	</div>
     	<div class="col-md-6">
 	    	<h3> Topics from RAKE Analysis </h3>
 	    	<ul class="list-group">
-	    		<li class="list-group-item" ng-repeat="topic in posttopics"> {{topic}} </li>
+	    		<li class="list-group-item" ng-repeat="kw in post.keywords"> {{kw}} </li>
 	    	</ul>
     	</div>
     </div>
@@ -152,6 +154,9 @@
 									}
 						 };
 	 		$http(get_request);
+	 		setTimeout( function(){ 
+	 			table.ajax.reload();
+  			}  , 1000 );
 	 	}
 
 	 	// Gets the posts and draws the histogram
@@ -183,12 +188,7 @@
 			$http.get("/get/post/"+number).then(function(response){
 				console.log(response.data);
 				$scope.postnum = number;
-				$scope.posttitle = response.data.data.title;
-				$scope.postbody = response.data.data.body;
-				$scope.posttime = response.data.data.date;
-				$scope.posttags = response.data.data.tags;
-				$scope.postcomments = response.data.data.comments;
-				$scope.posttopics = response.data.data.topics;
+				$scope.post = response.data.data;
 				MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 				$scope.active = 2;
 			});

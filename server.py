@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import Post, Comment, Topic 
+from models import Post, Comment, Tag
 from utils import *
 
 app = Flask(__name__)
@@ -10,18 +10,18 @@ db = SQLAlchemy(app)
 
 class PostConfig:
     """
-    Class used by get_posts, and get_table_posts 
+    Class used by get_posts, and get_table_posts
     to get the specific posts (as filtered)
     """
     def reset():
         PostConfig.startdate = datetime.strptime('01012000','%m%d%Y')
         PostConfig.enddate = datetime.now()
         PostConfig.limit = 500
-        PostConfig.topics = None
+        PostConfig.tags = None
 
     def get():
         return db.session.query(Post).filter(
-            Post.time.between(PostConfig.startdate,PostConfig.enddate)
+            Post.time.between(PostConfig.startdate, PostConfig.enddate)
             ).limit(PostConfig.limit).all()
 
 
@@ -31,13 +31,13 @@ class CommentConfig:
     to get the specific comments (as filtered)
     """
     def reset():
-        CommentConfig.startdate = datetime.strptime('01012000','%m%d%Y')
+        CommentConfig.startdate = datetime.strptime('01012000', '%m%d%Y')
         CommentConfig.enddate = datetime.now()
         CommentConfig.limit = 500
 
     def get():
         return db.session.query(Comment).filter(
-            Post.time.between(CommentConfig.startdate,CommentConfig.enddate)
+            Post.time.between(CommentConfig.startdate, CommentConfig.enddate)
             ).limit(CommentConfig.limit).all()
 
 PostConfig.reset()
@@ -47,7 +47,7 @@ CommentConfig.reset()
 @app.route('/')
 def home():
     """
-        Serves the main page
+    Serves the main page
     """
     f = open("static/analytics.html")
     return f.read()
@@ -79,10 +79,10 @@ def get_comments():
     return jsonify(data=commentdata)
 
 
-@app.route('/get/topics')
-def get_topics():
-    topics = db.session.query(Topic).all()
-    return jsonify(data=[topic.name for topic in topics])
+@app.route('/get/tags')
+def get_tags():
+    tags = db.session.query(Tag).all()
+    return jsonify(data=[tag.name for tag in tags])
 
 
 @app.route('/get/post/<int:post_id>')
@@ -90,9 +90,6 @@ def get_post(post_id):
     post_id = to_default(post_id)
     post = db.session.query(Post).get(post_id)
     dictionary = post_to_dictionary(post)
-    dictionary['comments'] = [comment_to_dictionary(comm) for comm in post.children]
-    text = post.subject + " " + post.body + " ".join([c.text for c in post.children])
-    dictionary['topics'] = get_keywords(text)
     return jsonify(data=dictionary)
 
 ########################################
@@ -117,12 +114,11 @@ def select_post():
     return ''
 
 
-@app.route('/select/topic')
-def select_topic():
-    topic = request.args.get('topic',None)
-    if topic:
-        PostConfig.topics = topic
-        CommentConfig.topics = topic
+@app.route('/select/tag')
+def select_tag():
+    tag = request.args.get('tag',None)
+    if tag:
+        PostConfig.tags = tag
 
 
 @app.route('/select/comment')

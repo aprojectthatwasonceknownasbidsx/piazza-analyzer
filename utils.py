@@ -16,15 +16,20 @@ def post_to_dictionary(post):
         polarity- TextBlob's guess of the polarity of the comment
         subjectivity- Textblob's guess of subjectivity of comment.
     """
+
     p = dict()
-    p['title'] = post.subject
-    p['body'] = post.body
-    p['tags'] = [topic.name for topic in post.topics]
+    p['title'] = post.title
+    p['body'] = post.text
+    p['tags'] = [tag.name for tag in post.tags]
     p['date'] = post.time
     p['time'] = time.mktime(post.time.timetuple())
-    body_tb = TextBlob(post.body)
-    p['polarity'] = body_tb.sentiment.polarity
-    p['subjectivity'] = body_tb.sentiment.subjectivity
+    if post.analysis:
+        p['polarity'] = post.analysis[0].polarity
+        p['subjectivity'] = post.analysis[0].subjectivity
+        p['keywords'] = [kw.name for kw in post.analysis[0].keywords]
+    p['views'] = post.views
+    p['favorites'] = post.favorites
+    p['comments'] = [comment_to_dictionary(comm) for comm in post.comments]
     return p
 
 
@@ -35,9 +40,10 @@ def post_to_table(post):
     """
     p = list()
     p.append(post.index)  # Index
-    p.append(post.subject)  # Title
-    p.append("--".join([topic.name for topic in post.topics]))  # Categories
+    p.append(post.title)  # Title
+    p.append("--".join([tag.name for tag in post.tags]))  # Categories
     p.append(datetime.strftime(post.time,'%m/%d/%Y'))  # Time
+    p.append(len(post.comments))
     return p
 
 
@@ -54,10 +60,9 @@ def comment_to_dictionary(comment):
     p['comment'] = comment.text
     p['date'] = comment.time
     p['time'] = time.mktime(comment.time.timetuple())
-    body_tb = TextBlob(comment.text)
-    p['polarity'] = body_tb.sentiment.polarity
-    p['subjectivity'] = body_tb.sentiment.subjectivity
+    p['type'] = comment.type
     return p
+
 
 def get_keywords(text):
     """
@@ -67,5 +72,14 @@ def get_keywords(text):
     rake = Rake("SmartStoplist.txt")
     keywords = rake.run(text)
     return [k[0] for k in keywords if len(k[0].split(" ")) <= 2 and k[1] > 1]
+
+
+def get_sentiment(text):
+    body_tb = TextBlob(text)
+    return body_tb.sentiment.polarity, body_tb.sentiment.subjectivity
+
+
+def get_all_text(post):
+    return post.title + " " + post.text + " ".join([c.text for c in post.comments])
 
 to_default = lambda x: max(1, x)
