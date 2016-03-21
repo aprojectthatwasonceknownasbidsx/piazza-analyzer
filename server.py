@@ -1,10 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from models import Post, Comment, Topic 
-from datetime import datetime
-from textblob import TextBlob
-import time
-from rake import Rake
+from utils import *
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -55,53 +52,11 @@ def home():
     f = open("static/analytics.html")
     return f.read()
 
-
-def post_to_dictionary(post):
-    """
-    Converts a post into a dictionary of relevant info
-    and analyses
-    """
-    p = dict()
-    p['title'] = post.subject
-    p['body'] = post.body
-    p['tags'] = [topic.name for topic in post.topics]
-    p['date'] = post.time
-    p['time'] = time.mktime(post.time.timetuple())
-    body_tb = TextBlob(post.body)
-    p['polarity'] = body_tb.sentiment.polarity
-    p['subjectivity'] = body_tb.sentiment.subjectivity
-    return p
-
-
-def post_to_table(post):
-    """
-    Converts a post into a dictionary of relevant info
-    and analyses
-    """
-    p = list()
-    p.append(post.index)  # Index
-    p.append(post.subject)  # Title
-    p.append("--".join([topic.name for topic in post.topics]))  # Categories
-    p.append(datetime.strftime(post.time,'%m/%d/%Y'))  # Time
-    return p
-
-
-def comment_to_dictionary(comment):
-    """
-    Converts a comment into a dicitonary of relevant
-    info and analysis
-    """
-    p = dict()
-    p['comment'] = comment.text
-    p['date'] = comment.time
-    p['time'] = time.mktime(comment.time.timetuple())
-    body_tb = TextBlob(comment.text)
-    p['polarity'] = body_tb.sentiment.polarity
-    p['subjectivity'] = body_tb.sentiment.subjectivity
-    return p
-
-to_default = lambda x: max(1, x)
-
+########################################
+#
+#           GETTING POSTS
+#
+########################################
 
 @app.route('/get/post')
 def get_posts():
@@ -140,10 +95,12 @@ def get_post(post_id):
     dictionary['topics'] = get_keywords(text)
     return jsonify(data=dictionary)
 
-def get_keywords(text):
-    rake = Rake("SmartStoplist.txt")
-    keywords = rake.run(text)
-    return [k[0] for k in keywords if len(k[0].split(" ")) <= 2 and k[1] > 1]
+########################################
+#
+#           FILTER RESULTS
+#
+########################################
+
 
 @app.route('/select/post')
 def select_post():
@@ -186,6 +143,13 @@ def reset():
     PostConfig.reset()
     CommentConfig.reset()
     return ''
+
+################################
+#
+#       MAIN
+#
+################################
+
 
 if __name__ == '__main__':
     app.debug = True
