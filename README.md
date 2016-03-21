@@ -28,8 +28,8 @@ To run the visualization, do the following. We assume that you have already star
 	
 	python -i analyze.py
 
-	analysis = PiazzaAnalyzer()
-	analysis.analyze_posts()
+	>>> analysis = PiazzaAnalyzer()
+	>>> analysis.analyze_posts()
 
 2) Once the analyzer has finished, to run the visualization, run the server and load the webpage: localhost:5000
 
