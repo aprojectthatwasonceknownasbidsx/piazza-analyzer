@@ -24,14 +24,17 @@ To run the visualization, do the following. We assume that you have already star
 
 1) If the database hasn't already been created (e.g. this is the first time you are running the scraper), run the scraper, and copy the database over to this directory.
 	
-	cd piazza-scraper
-	python models.py
-	python -i scraper.py
-	cp test.db piazza-analyzer/
+2) First, we must run the Natural Language Analysis on the database:
+	
+	python -i analyze.py
 
-2) To run the visualization, run
+	analysis = PiazzaAnalyzer()
+	analysis.analyze_posts()
+
+2) Once the analyzer has finished, to run the visualization, run the server and load the webpage: localhost:5000
 
 	python -i server.py
+
 
 
 # Screenshots
