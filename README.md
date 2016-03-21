@@ -1,7 +1,6 @@
 # Piazza Analyzer
 
-Analyzes data from Piazza through velocity and keyword checking through a 
-visual interface
+Analyzes data from Piazza through sentiment analysis and keyword checking 
 
 This requires a database from [Piazza-Scraper](https://github.com/bidsX/piazza-scraper).
 
@@ -22,36 +21,23 @@ To run the visualization, do the following. We assume that you have already star
 
 	source activate ENV_NAME
 
-1) If the database hasn't already been created (e.g. this is the first time you are running the scraper), run the scraper, and copy the database over to this directory.
-	
-2) First, we must run the Natural Language Analysis on the database:
-	
+1) If the database hasn't already been created (e.g. this is the first time you are runening the scraper), run the scraper, and copy the database over to this directory.
+		
 	python -i analyze.py
 
 	>>> analysis = PiazzaAnalyzer()
 	>>> analysis.analyze_posts()
 
-2) Once the analyzer has finished, to run the visualization, run the server and load the webpage: localhost:5000
-
-	python -i server.py
 
 
 
-# Screenshots
-
-![Post Analysis](/screenshots/singlepost.png?raw=true "Post Analysis")
-
-![Histogram](/screenshots/histogram.png?raw=true "Histogram")
-
-![Table View](/screenshots/table.png?raw=true "Table View")
 
 # Development
 
 The project structure is as following
 
+- analyze.py- Main Analysis Module
 - models.py - Models for SQLAlchemy ORM
 - utils.py  - Helpful utilities for parsing Piazza blocks
-- server.py - The main Flask Application
-- static/ 	- All HTML/CSS/JS files
 - rake.py   - Python3 Implementation of  Rapid Automatic Keyword Extraction - Ported from [RAKE](https://github.com/aneesha/RAKE)
 
