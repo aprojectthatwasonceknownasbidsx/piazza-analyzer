@@ -28,6 +28,7 @@ class PiazzaAnalyzer:
         text = get_all_text(post)
         polarity, subjectivity = get_sentiment(text)
         keywords = get_keywords(text)
+        keywords = keywords[:10]
         analysis = PostAnalysis(polarity, subjectivity)
         for kw in keywords:
             keyword = self.get_keyword(kw)
@@ -36,8 +37,10 @@ class PiazzaAnalyzer:
         self.session.commit()
 
     def analyze_posts(self):
+        self.session.query(Keyword).delete()
+        self.session.query(PostAnalysis).delete()
+        self.session.commit()
         posts = self.session.query(Post).all()
         for post in posts:
-            post.analysis = []
             self.analyze_post(post)
             print(post.index,post.title)

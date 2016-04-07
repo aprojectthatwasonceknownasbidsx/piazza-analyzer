@@ -212,9 +212,13 @@ howbeit
 however
 i
 i'd
+id
 i'll
+ill
 i'm
+im
 i've
+ive
 ie
 if
 ignored
@@ -233,10 +237,14 @@ into
 inward
 is
 isn't
+isnt
 it
+itd
 it'd
 it'll
+itll
 it's
+its
 its
 itself
 j
@@ -570,3 +578,5 @@ yourself
 yourselves
 z
 zero
+top
+bottom
